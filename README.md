@@ -1,7 +1,7 @@
 Introduction
 ============
 
-hiera-redis is a empowers Hiera to retrieve values from a Redis database.
+hiera-redis empowers Hiera to retrieve values from a Redis database.
 
 Supported data types:
 
