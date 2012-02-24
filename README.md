@@ -13,6 +13,12 @@ Supported data types:
 
 This code assumes your Redis keys are separated with :
 
+Install
+=======
+<pre>
+gem install hiera-redis
+</pre>
+
 Example
 =======
 

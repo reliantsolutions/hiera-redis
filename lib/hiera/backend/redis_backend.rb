@@ -2,6 +2,8 @@ class Hiera
   module Backend
     class Redis_backend
 
+      VERSION="0.0.5"
+
       def initialize
 
         require 'redis'
