@@ -13,6 +13,18 @@ Supported data types:
 
 This code assumes your Redis keys are separated with :
 
+Configuration
+=============
+In hiera.yaml, the folowing options can be defined if needed:
+<pre>
+:redis:
+  :port: 6398
+  :host: db.example.com
+</pre>
+
+port will default to 6397 and host will default to 127.0.0.1 if left
+undefined.
+
 Install
 =======
 <pre>

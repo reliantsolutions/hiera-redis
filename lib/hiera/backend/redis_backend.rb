@@ -2,14 +2,17 @@ class Hiera
   module Backend
     class Redis_backend
 
-      VERSION="0.0.5"
+      VERSION="0.1.0"
 
       def initialize
 
         require 'redis'
         Hiera.debug("Hiera Redis backend starting")
 
-        @r = Redis.new
+        port = Config[:redis][:port] || 6397
+        host = Config[:redis][:host] || '127.0.0.1'
+
+        @r = Redis.new(:host => host, :port => port)
       end
 
       def lookup(key, scope, order_override, resolution_type)
