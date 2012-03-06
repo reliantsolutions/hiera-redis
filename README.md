@@ -20,7 +20,10 @@ In hiera.yaml, the folowing options can be defined if needed:
 :redis:
   :port: 6398
   :host: db.example.com
+  :path: /tmp/redis.sock
 </pre>
+
+If used, path takes a higher priority over port/host values.
 
 port will default to 6397 and host will default to 127.0.0.1 if left
 undefined.
