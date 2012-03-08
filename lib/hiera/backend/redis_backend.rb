@@ -2,7 +2,7 @@ class Hiera
   module Backend
     class Redis_backend
 
-      VERSION="0.1.1"
+      VERSION="0.1.2"
 
       def initialize
 
@@ -11,7 +11,7 @@ class Hiera
 
         # better error checking needed here?
         path = Config[:redis][:path]
-        port = Config[:redis][:port] || 6397
+        port = Config[:redis][:port] || 6379
         host = Config[:redis][:host] || '127.0.0.1'
 
         if path.nil?

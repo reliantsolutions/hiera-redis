@@ -18,14 +18,14 @@ Configuration
 In hiera.yaml, the folowing options can be defined if needed:
 <pre>
 :redis:
-  :port: 6398
+  :port: 6380
   :host: db.example.com
   :path: /tmp/redis.sock
 </pre>
 
 If used, path takes a higher priority over port/host values.
 
-port will default to 6397 and host will default to 127.0.0.1 if left
+port will default to 6379 and host will default to 127.0.0.1 if left
 undefined.
 
 Install
@@ -64,4 +64,5 @@ Contact
 * Author: Adam Kosmin c/o Reliant Security, Inc.
 * Email: akosmin@reliantsecurity.com
 * IRC (freenode): windowsrefund
+* Myspace: yea right!
 
