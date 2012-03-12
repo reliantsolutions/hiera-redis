@@ -18,15 +18,22 @@ Configuration
 In hiera.yaml, the folowing options can be defined if needed:
 <pre>
 :redis:
+  :password: clearp@ssw0rd
   :port: 6380
+  :db: 1
   :host: db.example.com
   :path: /tmp/redis.sock
 </pre>
 
 If used, path takes a higher priority over port/host values.
 
-port will default to 6379 and host will default to 127.0.0.1 if left
-undefined.
+default values:
+
+password: nil
+port: 6379
+host: localhost
+path: nil
+db: 0
 
 Install
 =======
@@ -55,7 +62,7 @@ Configure hiera.yaml
 Now in your Puppet manifest...
 
 <pre>
-$foo = hiera('bar')
+$foo = hiera('foo')
 </pre>
 
 Contact

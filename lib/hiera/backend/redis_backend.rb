@@ -2,23 +2,22 @@ class Hiera
   module Backend
     class Redis_backend
 
-      VERSION="0.1.2"
+      VERSION="0.1.3"
 
       def initialize
 
         require 'redis'
         Hiera.debug("Hiera Redis backend starting")
 
-        # better error checking needed here?
-        path = Config[:redis][:path]
-        port = Config[:redis][:port] || 6379
-        host = Config[:redis][:host] || '127.0.0.1'
-
-        if path.nil?
-          @r = Redis.new(:host => host, :port => port)
-        else
-          @r = Redis.new(:path => path)
+        # default values
+        options = {:host => 'localhost', :port => 6379, :db => 0, :password => nil, :timeout => 3, :path => nil}
+        
+        # config overrides default values
+        options.each_key do |k|
+          options[k] = Config[:redis][k] if Config[:redis].has_key?(k)
         end
+
+        @r = Redis.new(options)
       end
 
       def lookup(key, scope, order_override, resolution_type)
