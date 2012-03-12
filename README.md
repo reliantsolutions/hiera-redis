@@ -29,11 +29,11 @@ If used, path takes a higher priority over port/host values.
 
 default values:
 
-password: nil
-port: 6379
-host: localhost
-path: nil
-db: 0
+* password: nil
+* port: 6379
+* host: localhost
+* path: nil
+* db: 0
 
 Install
 =======
