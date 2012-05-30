@@ -2,12 +2,14 @@ class Hiera
   module Backend
     class Redis_backend
 
-      VERSION="0.1.3"
+      VERSION="0.1.4"
+
+      attr_reader :redis
 
       def initialize
 
         require 'redis'
-        Hiera.debug("Hiera Redis backend starting")
+        Hiera.debug("Hiera Redis backend #{VERSION} starting")
 
         # default values
         options = {:host => 'localhost', :port => 6379, :db => 0, :password => nil, :timeout => 3, :path => nil}
@@ -17,7 +19,35 @@ class Hiera
           options[k] = Config[:redis][k] if Config[:redis].has_key?(k)
         end
 
-        @r = Redis.new(options)
+        @redis = Redis.new(options)
+      end
+
+      def redis_query(args = {})
+
+        Hiera.debug("Searching for #{args.inspect}")
+        # convert our seperator in order to maintain yaml compatibility
+        redis_key = args[:source].gsub('/', ':')
+
+        if redis.type(redis_key) == "hash"
+          redis.hget(redis_key, args[:key])
+        else
+          redis_key << ":#{args[:key]}"
+          case redis.type(redis_key)
+          when "set"
+            redis.smembers(redis_key)
+          when "hash"
+            redis.hgetall(redis_key)
+          when "list"
+            redis.lrange(redis_key, 0, -1)
+          when "string"
+            redis.get(redis_key)
+          when "zset"
+            redis.zrange(redis_key, 0, -1)
+          else
+            Hiera.debug("No such key: #{redis_key}")
+            nil
+          end
+        end
       end
 
       def lookup(key, scope, order_override, resolution_type)
@@ -26,29 +56,10 @@ class Hiera
 
         Backend.datasources(scope, order_override) do |source|
 
-          # convert our seperator in order to maintain yaml compatibility
-          rkey = []
-          rkey << source.split('/')
-          rkey << key
-          rkey = rkey.join(':')
+          data = redis_query(:source => source, :key => key)
+          Hiera.debug("returned data: #{data}")
 
-          data = case @r.type(rkey)
-          when "set"
-            @r.smembers(rkey)
-          when "hash"
-            @r.hgetall(rkey)
-          when "list"
-            @r.lrange(rkey, 0, -1)
-          when "string"
-            @r.get(rkey)
-          when "zset"
-            @r.zrange(rkey, 0, -1)
-          else
-            Hiera.debug("No such key: #{rkey}")
-            next
-          end
-
-          next if data.empty?
+          next unless data
           new_answer = Backend.parse_answer(data, scope)
 
           case resolution_type
@@ -65,7 +76,6 @@ class Hiera
         end
 
         answer
-        
       end
     end
   end

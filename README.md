@@ -1,6 +1,8 @@
 Introduction
 ============
 
+Version 0.2.0
+
 hiera-redis empowers Hiera to retrieve values from a Redis database.
 
 Supported data types:
@@ -9,7 +11,7 @@ Supported data types:
 * sorted set
 * list
 * string
-* hash
+* hash (ability to fetch complete hash or a specific value; see below)
 
 This code assumes your Redis keys are separated with :
 
@@ -38,31 +40,64 @@ default values:
 Install
 =======
 <pre>
-gem install hiera-redis
+gem install hiera-redis hiera-puppet
 </pre>
 
 Example
 =======
 
-Add a string key/value pair to Redis
+Add some data into your Redis database
 
 <pre>
 set Debian:foo bar
+set common:foo baz
+hmset pets:kitties Evil black Handsome gray
 </pre>
 
-Configure hiera.yaml
+Configure ~/.puppet/hiera.yaml
 
 <pre>
-:hierarchy:
-  - %{operatingsytem}
-:backends:
-  - redis
+cat <<EOF > ~/.puppet/hiera.yaml
+> :hierarchy:
+>   - %{operatingsytem}
+>   - pets
+>   - common
+> :backends:
+>   - redis
+> EOF
 </pre>
 
-Now in your Puppet manifest...
+Create a dummy module in order to load the hiera functions
+<pre>
+mkdir -p /tmp/modules/foo/lib/puppet/parser
+cd /tmp/modules/foo/lib/puppet/parser
+ln -s `gem env gemdir`/gems/hiera-puppet-0.3.0/lib/puppet/parser/functions
+
+Create a simple Puppet manifest
 
 <pre>
-$foo = hiera('foo')
+cat <<EOF > test.pp
+> $foo = hiera('foo')
+> notice("foo is $foo")
+> $kitties = hiera_hash('kitties')
+> notice("A hash of kitties! $kitties")
+> $evil_color = hiera('Evil', nil, 'pets/kitties')
+> $handsome_color = hiera('Handsome', nil 'pets/kitties')
+> notice("Evil is $evil_color and Handsome is $handsome_color")
+> EOF
+</pre>
+
+Apply the manifest
+<pre>
+puppet apply --modulepath=/tmp/modules test.pp
+</pre>
+
+You should see similar output:
+<pre>
+notice: Scope(Class[main]): foo is bar
+notice: Scope(Class[main]): A hash of kitties!: EvilblackHandsomegray
+notice: Scope(Class[main]): Evil is black and Handsome is gray
+notice: Finished catalog run in 0.04 seconds
 </pre>
 
 Contact
