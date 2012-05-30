@@ -85,11 +85,12 @@ Apply the manifest
 `puppet apply --modulepath=/tmp/modules test.pp`
 
 You should see similar output:
-
-  notice: Scope(Class[main]): foo is bar
-  notice: Scope(Class[main]): A hash of kitties!: EvilblackHandsomegray
-  notice: Scope(Class[main]): Evil is black and Handsome is gray
-  notice: Finished catalog run in 0.04 seconds
+<pre>
+notice: Scope(Class[main]): foo is bar
+notice: Scope(Class[main]): A hash of kitties!: EvilblackHandsomegray
+notice: Scope(Class[main]): Evil is black and Handsome is gray
+notice: Finished catalog run in 0.04 seconds
+</pre>
 
 Contact
 =======
