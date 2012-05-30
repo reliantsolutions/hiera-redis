@@ -66,7 +66,7 @@ Create a dummy module in order to load the hiera functions
 
 `mkdir -p /tmp/modules/foo/lib/puppet/parser`  
 `cd /tmp/modules/foo/lib/puppet/parser`  
-`ln -s `gem env gemdir`/gems/hiera-puppet-0.3.0/lib/puppet/parser/functions`  
+`ln -s $(gem env gemdir)/gems/hiera-puppet-0.3.0/lib/puppet/parser/functions`  
 
 Create a simple Puppet manifest
 
