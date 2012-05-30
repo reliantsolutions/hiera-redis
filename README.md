@@ -1,8 +1,6 @@
 Introduction
 ============
 
-Version 0.2.0
-
 hiera-redis empowers Hiera to retrieve values from a Redis database.
 
 Supported data types:
