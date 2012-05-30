@@ -76,7 +76,7 @@ Create a simple Puppet manifest
 `> $kitties = hiera_hash('kitties')`  
 `> notice("A hash of kitties! $kitties")`  
 `> $evil_color = hiera('Evil', nil, 'pets/kitties')`  
-`> $handsome_color = hiera('Handsome', nil 'pets/kitties')`  
+`> $handsome_color = hiera('Handsome', nil, 'pets/kitties')`  
 `> notice("Evil is $evil_color and Handsome is $handsome_color")`  
 `> EOF`  
 
