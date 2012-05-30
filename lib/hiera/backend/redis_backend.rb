@@ -24,7 +24,6 @@ class Hiera
 
       def redis_query(args = {})
 
-        Hiera.debug("Searching for #{args.inspect}")
         # convert our seperator in order to maintain yaml compatibility
         redis_key = args[:source].gsub('/', ':')
 
@@ -57,7 +56,6 @@ class Hiera
         Backend.datasources(scope, order_override) do |source|
 
           data = redis_query(:source => source, :key => key)
-          Hiera.debug("returned data: #{data}")
 
           next unless data
           new_answer = Backend.parse_answer(data, scope)
