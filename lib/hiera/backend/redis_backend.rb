@@ -16,7 +16,7 @@ class Hiera
         
         # config overrides default values
         options.each_key do |k|
-          options[k] = Config[:redis][k] if Config[:redis].has_key?(k)
+          options[k] = Config[:redis][k] if Config[:redis].is_a?(Hash) && Config[:redis].has_key?(k)
         end
 
         @redis = Redis.new(options)
