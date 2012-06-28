@@ -23,6 +23,8 @@ In hiera.yaml, the following options can be defined if needed:
   :db: 1
   :host: db.example.com
   :path: /tmp/redis.sock
+  :soft_connection_failure: true   # Return nil if Redis server is unavailable
+                                   # instead of raising exception
 </pre>
 
 If used, path takes a higher priority over port/host values.
@@ -34,6 +36,7 @@ default values:
 * host: localhost
 * path: nil
 * db: 0
+* soft_connection_failure: false
 
 Install
 =======
