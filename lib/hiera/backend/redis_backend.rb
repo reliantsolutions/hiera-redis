@@ -20,6 +20,9 @@ class Hiera
         end
 
         @redis = Redis.new(options)
+
+        @soft_connection_failure = false  # Thus we are preventing the current behaviour
+        @soft_connection_failure = Config[:redis][:soft_connection_failure] if Config[:redis].is_a?(Hash) && Config[:redis].has_key?(:soft_connection_failure)
       end
 
       def redis_query(args = {})
@@ -27,25 +30,31 @@ class Hiera
         # convert our seperator in order to maintain yaml compatibility
         redis_key = args[:source].gsub('/', ':')
 
-        if redis.type(redis_key) == "hash"
-          redis.hget(redis_key, args[:key])
-        else
-          redis_key << ":#{args[:key]}"
-          case redis.type(redis_key)
-          when "set"
-            redis.smembers(redis_key)
-          when "hash"
-            redis.hgetall(redis_key)
-          when "list"
-            redis.lrange(redis_key, 0, -1)
-          when "string"
-            redis.get(redis_key)
-          when "zset"
-            redis.zrange(redis_key, 0, -1)
+        begin
+          if redis.type(redis_key) == "hash"
+            redis.hget(redis_key, args[:key])
           else
-            Hiera.debug("No such key: #{redis_key}")
-            nil
+            redis_key << ":#{args[:key]}"
+            case redis.type(redis_key)
+            when "set"
+              redis.smembers(redis_key)
+            when "hash"
+              redis.hgetall(redis_key)
+            when "list"
+              redis.lrange(redis_key, 0, -1)
+            when "string"
+              redis.get(redis_key)
+            when "zset"
+              redis.zrange(redis_key, 0, -1)
+            else
+              Hiera.debug("No such key: #{redis_key}")
+              nil
+            end
           end
+        rescue Redis::CannotConnectError => e
+          raise e unless @soft_connection_failure
+          Hiera.warn("Cannot connect to Redis server")
+          nil
         end
       end
 
