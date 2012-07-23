@@ -2,7 +2,7 @@ class Hiera
   module Backend
     class Redis_backend
 
-      VERSION="0.2.1"
+      VERSION="0.2.2"
 
       attr_reader :redis
 
