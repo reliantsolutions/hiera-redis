@@ -3,40 +3,37 @@ Introduction
 
 hiera-redis empowers Hiera to retrieve values from a Redis database.
 
-Supported data types:
+Supported Redis types:
 
 * set
 * sorted set
 * list
 * string
-* hash (ability to fetch complete hash or a specific value; see below)
+* hash
 
-This code assumes your Redis keys are separated with :
+All types can be JSON or YAML serialized but I don't see anything other than a string type being used for the job.
 
 Configuration
 =============
 In hiera.yaml, the following options can be defined if needed:
 <pre>
 :redis:
-  :password: clearp@ssw0rd
-  :port: 6380
-  :db: 1
-  :host: db.example.com
-  :path: /tmp/redis.sock
-  :soft_connection_failure: true   # Return nil if Redis server is unavailable
-                                   # instead of raising exception
+  :password: clearp@ssw0rd        # if your Redis server requires authentication
+
+  :port: 6380                     # unless present, defaults to 6379
+
+  :db: 1                          # unless present, defaults to 0
+
+  :host: db.example.com           # unless present, defaults to localhost
+
+  :path: /tmp/redis.sock          # overrides port if unixsocket exists
+
+  :soft_connection_failure: true  # bypass exception if Redis server is unavailable; default is false
+
+  :deserialize: :json             # when you've serialized your data; can also be set to :yaml
+
+  :separator: /                   # unless present, defaults to :
 </pre>
-
-If used, path takes a higher priority over port/host values.
-
-default values:
-
-* password: nil
-* port: 6379
-* host: localhost
-* path: nil
-* db: 0
-* soft_connection_failure: false
 
 Install
 =======
@@ -48,50 +45,35 @@ Example
 
 Add some data into your Redis database
 
-`set Debian:foo bar`  
-`set common:foo baz`  
-`hmset pets:kitties Evil black Handsome gray`  
+`set Debian:foo bar`
+`set common:foo baz`
+`hmset pets:kitties Evil black Handsome gray`
 
 Configure ~/.puppet/hiera.yaml
 
-`cat <<EOF > ~/.puppet/hiera.yaml`  
-`> :hierarchy:`  
-`>   - %{operatingsytem}`  
-`>   - pets`  
-`>   - common`  
-`> :backends:`  
-`>   - redis`  
-`> EOF`  
+`cat <<EOF > ~/.puppet/hiera.yaml`
+`> :hierarchy:`
+`>   - %{operatingsytem}`
+`>   - pets`
+`>   - common`
+`> :backends:`
+`>   - redis`
+`> EOF`
 
-Create a dummy module in order to load the hiera functions
+What is foo?
 
-`mkdir -p /tmp/modules/foo/lib/puppet/parser`  
-`cd /tmp/modules/foo/lib/puppet/parser`  
-`ln -s $(gem env gemdir)/gems/hiera-puppet-0.3.0/lib/puppet/parser/functions`  
+`$ hiera -c ~/.puppet/hiera.yaml foo`
 
-Create a simple Puppet manifest
+What is bar?
 
-`cat <<EOF > test.pp`  
-`> $foo = hiera('foo')`  
-`> notice("foo is $foo")`  
-`> $kitties = hiera_hash('kitties')`  
-`> notice("A hash of kitties! $kitties")`  
-`> $evil_color = hiera('Evil', nil, 'pets/kitties')`  
-`> $handsome_color = hiera('Handsome', nil, 'pets/kitties')`  
-`> notice("Evil is $evil_color and Handsome is $handsome_color")`  
-`> EOF`  
+`$ hiera -c ~/.puppet/hiera.yaml foo`
 
-Apply the manifest
+and the kitties?
 
-`puppet apply --modulepath=/tmp/modules test.pp`
+`$ hiera -c ~/.puppet/hiera.yaml kitties`
 
-You should see similar output:
-<pre>
-notice: Scope(Class[main]): foo is bar
-notice: Scope(Class[main]): A hash of kitties!: EvilblackHandsomegray
-notice: Scope(Class[main]): Evil is black and Handsome is gray
-notice: Finished catalog run in 0.04 seconds
-</pre>
+hiera('Evil', nil, 'pets/kitties')`
+hiera('Handsome', nil, 'pets/kitties')`
 
 Contact
 =======
@@ -99,5 +81,5 @@ Contact
 * Author: Adam Kosmin c/o Reliant Security, Inc.
 * Email: akosmin@reliantsecurity.com
 * IRC (freenode): windowsrefund
-* Myspace: yea right!
+* Myspace: no
 
