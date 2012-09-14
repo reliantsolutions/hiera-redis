@@ -55,7 +55,7 @@ Configure ~/.puppet/hiera.yaml
   - common
 :backends:
   - redis
-<pre>
+</pre>
 
 What is foo?
 
