@@ -2,7 +2,7 @@ class Hiera
   module Backend
     class Redis_backend
 
-      VERSION="1.0.0"
+      VERSION="1.0.1"
 
       attr_reader :redis, :options
 
@@ -85,8 +85,7 @@ class Hiera
           :timeout => 3,
           :path => nil,
           :soft_connection_failure => false,
-          :separator => ':',
-          :json => false
+          :separator => ':'
         }.merge Config[:redis] || {}
 
         require 'redis'

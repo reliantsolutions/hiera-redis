@@ -17,7 +17,7 @@ All types can be JSON or YAML serialized but I don't see anything other than a s
 Configuration
 =============
 
-In hiera.yaml, the following options can be defined if needed:
+The following options can be specified in hiera.yaml:
 <pre>
 :redis:
   :password: clearp@ssw0rd        # if your Redis server requires authentication
@@ -26,8 +26,12 @@ In hiera.yaml, the following options can be defined if needed:
   :host: db.example.com           # unless present, defaults to localhost
   :path: /tmp/redis.sock          # overrides port if unixsocket exists
   :soft_connection_failure: true  # bypass exception if Redis server is unavailable; default is false
-  :deserialize: :json             # when you've serialized your data; can also be set to :yaml
   :separator: /                   # unless present, defaults to :
+
+  :deserialize: :json             # Try to deserialize; both :yaml and :json are supported
+                                  # When :json is used and JSON::ParseError is raised, gracefully fall
+                                  # back to returning the original value. This is needed to work around
+                                  # JSON.parse('foo'.to_json)
 </pre>
 
 Install
@@ -63,7 +67,7 @@ What is foo?
 
 What is bar?
 
-`$ hiera -c ~/.puppet/hiera.yaml foo`
+`$ hiera -c ~/.puppet/hiera.yaml bar`
 
 and the kitties?
 
