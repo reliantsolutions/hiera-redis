@@ -14,7 +14,7 @@ class Hiera
       def deserialize(args = {})
         return nil if args[:string].nil?
 
-        Hiera.debug("Found %s key in %s source" % [args[:key], args[:source]])
+        Hiera.debug "Found %s" % args[:redis_key]
         return args[:string] unless options.include? :deserialize
 
         case options[:deserialize]
@@ -44,10 +44,11 @@ class Hiera
         Hiera.debug("Looking up %s in Redis backend" % key)
 
         Backend.datasources(scope, order_override) do |source|
+          redis_key = "%s" % [source.split('/'), key].join(options[:separator])
           Hiera.debug("Looking for data source %s" % source)
 
-          data = deserialize(:string => redis_query(:source => source, :key => key),
-                             :source => source,
+          data = deserialize(:string => redis_query(redis_key),
+                             :redis_key => redis_key,
                              :key => key)
 
           next unless data
@@ -95,20 +96,17 @@ class Hiera
         retry if require 'rubygems'
       end
 
-      def redis_query(args = {})
+      def redis_query(redis_key)
 
-        # convert our seperator in order to maintain yaml compatibility
-        redis_key = "%s" % [args[:source].split('/'), args[:key]].join(options[:separator])
-
-        case redis.type(redis_key)
+        case redis.type redis_key
         when 'set'
-          redis.smembers(redis_key)
+          redis.smembers redis_key
         when 'hash'
-          redis.hgetall(redis_key)
+          redis.hgetall redis_key
         when 'list'
           redis.lrange(redis_key, 0, -1)
         when 'string'
-          redis.get(redis_key)
+          redis.get redis_key
         when 'zset'
           redis.zrange(redis_key, 0, -1)
         else
