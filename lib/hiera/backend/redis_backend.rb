@@ -2,7 +2,7 @@ class Hiera
   module Backend
     class Redis_backend
 
-      VERSION="1.0.1"
+      VERSION="1.0.2"
 
       attr_reader :redis, :options
 
@@ -12,44 +12,43 @@ class Hiera
       end
 
       def deserialize(args = {})
-        return nil if args[:string].nil?
+        return nil if args[:data].nil?
+        return args[:data] unless args[:data].is_a? String
 
-        Hiera.debug "Found %s" % args[:redis_key]
-        return args[:string] unless options.include? :deserialize
-
-        case options[:deserialize]
+        result = case options[:deserialize]
         when :json
-          Hiera.debug("Deserializing JSON")
           require 'json'
-
-          JSON.parse(args[:string])
+          JSON.parse args[:data]
         when :yaml
-          Hiera.debug("Deserializing YAML")
           require 'yaml'
-          YAML::load(args[:string])
+          YAML::load args[:data]
         else
-          Hiera.warn("Invalid configuration for :deserialize; found %s" % options[:deserialize])
-          args[:string]
+          Hiera.warn "Invalid configuration for :deserialize; found %s" % options[:deserialize]
+          args[:data]
         end
+
+        Hiera.debug "Deserialized %s" % options[:deserialize].to_s.upcase
+        result
+
       # when we try to deserialize a string
       rescue JSON::ParserError
-        args[:string]
+        args[:data]
       rescue => e
-        Hiera.warn("Exception raised: %s: %s" % [e.class, e.message])
+        Hiera.warn "Exception raised: %s: %s" % [e.class, e.message]
       end
 
       def lookup(key, scope, order_override, resolution_type)
         answer = nil
 
-        Hiera.debug("Looking up %s in Redis backend" % key)
-
         Backend.datasources(scope, order_override) do |source|
           redis_key = "%s" % [source.split('/'), key].join(options[:separator])
-          Hiera.debug("Looking for data source %s" % source)
+          Hiera.debug "Looking for %s%s%s" % [source, options[:separator], key]
 
-          data = deserialize(:string => redis_query(redis_key),
-                             :redis_key => redis_key,
-                             :key => key)
+          data = redis_query redis_key
+
+          data = deserialize(:data => data,
+                  :redis_key => redis_key,
+                  :key => key) if options.include? :deserialize
 
           next unless data
 
