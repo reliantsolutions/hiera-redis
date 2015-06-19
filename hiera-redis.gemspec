@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.has_rdoc = false
   s.homepage = "http://github.com/reliantsecurity/hiera-redis"
   s.license = "GPL-3"
-  s.add_dependency 'hiera', '~> 1.0'
+  s.add_dependency 'hiera', '>= 1.0'
   s.files = Dir["lib/**/*.rb"]
   s.files += ["COPYING"]
 end
