@@ -37,7 +37,7 @@ class Hiera
         Hiera.warn "Exception raised: %s: %s" % [e.class, e.message]
       end
 
-      def lookup(key, scope, order_override, resolution_type)
+      def lookup(key, scope, order_override, resolution_type, context = {})
         answer = nil
 
         Backend.datasources(scope, order_override) do |source|
@@ -52,7 +52,7 @@ class Hiera
 
           next unless data
 
-          new_answer = Backend.parse_answer(data, scope)
+          new_answer = Backend.parse_answer(data, scope, context = context)
 
           case resolution_type
           when :array
