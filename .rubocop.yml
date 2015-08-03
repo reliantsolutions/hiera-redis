@@ -1,0 +1,18 @@
+AllCops:
+  DisplayCopNames: true
+Metrics/LineLength:
+  Max: 125
+Style/Documentation:
+  Enabled: false
+Style/EachWithObject:
+  Enabled: false
+Style/NumericLiterals:
+  MinDigits: 7
+Style/SignalException:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/ClassLength:
+  Enabled: false
