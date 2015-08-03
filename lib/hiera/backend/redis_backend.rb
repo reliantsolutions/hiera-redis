@@ -78,15 +78,15 @@ class Hiera
       end
 
       def redis_query(redis_key)
-        case redis.type redis_key
+        case redis.type(redis_key)
         when 'set'
-          redis.smembers redis_key
+          redis.smembers(redis_key)
         when 'hash'
-          redis.hgetall redis_key
+          redis.hgetall(redis_key)
         when 'list'
           redis.lrange(redis_key, 0, -1)
         when 'string'
-          redis.get redis_key
+          redis.get(redis_key)
         when 'zset'
           redis.zrange(redis_key, 0, -1)
         else
