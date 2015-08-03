@@ -114,7 +114,7 @@ class Hiera
         end
       rescue Redis::CannotConnectError => e
         Hiera.warn('Cannot connect to Redis server')
-        raise e unless options.has_key?(:soft_connection_failure)
+        raise e unless options.key?(:soft_connection_failure)
         nil
       end
     end
