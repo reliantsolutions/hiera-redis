@@ -3,7 +3,7 @@ require 'redis'
 class Hiera
   module Backend
     class Redis_backend
-      VERSION = '1.0.2'
+      VERSION = '2.0.0'
 
       attr_reader :options
 
