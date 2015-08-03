@@ -42,11 +42,8 @@ class Hiera
         answer = nil
 
         Backend.datasources(scope, order_override) do |source|
-          redis_key = [source.split('/'), key].join(options[:separator]).to_s
-          Hiera.debug("Looking for #{source}#{options[:separator]}#{key}")
-
-          data = redis_query redis_key
-
+          redis_key = (source.split('/') << key).join(options[:separator])
+          data = redis_query(redis_key)
           data = deserialize(data: data, redis_key: redis_key, key: key) if options.include?(:deserialize)
 
           next unless data
