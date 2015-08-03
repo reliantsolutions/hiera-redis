@@ -39,6 +39,7 @@ class Hiera
 
       def lookup(key, scope, order_override, resolution_type, context)
         answer = nil
+        found = false
 
         Backend.datasources(scope, order_override) do |source|
           redis_key = (source.split('/') << key).join(options[:separator])
@@ -46,10 +47,11 @@ class Hiera
           data = deserialize(data: data, redis_key: redis_key, key: key) if options.include?(:deserialize)
 
           next if data.nil?
+          found = true
 
           new_answer = Backend.parse_answer(data, scope, {}, context)
 
-          case resolution_type
+          case resolution_type.is_a?(Hash) ? :hash : resolution_type
           when :array
             raise "Hiera type mismatch: expected Array and got #{new_answer.class}" unless new_answer.is_a?(Array) || new_answer.is_a?(String)
             answer ||= []
@@ -57,13 +59,14 @@ class Hiera
           when :hash
             raise "Hiera type mismatch: expected Hash and got #{new_answer.class}" unless new_answer.is_a? Hash
             answer ||= {}
-            answer = new_answer.merge answer
+            answer = Backend.merge_answer(new_answer, answer, resolution_type)
           else
             answer = new_answer
             break
           end
         end
 
+        throw :no_such_key unless found
         answer
       end
 
