@@ -2,6 +2,8 @@ AllCops:
   DisplayCopNames: true
 Metrics/LineLength:
   Max: 125
+Style/ClassAndModuleCamelCase:
+  Enabled: false
 Style/Documentation:
   Enabled: false
 Style/EachWithObject:

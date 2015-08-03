@@ -15,16 +15,16 @@ class Hiera
         return args[:data] unless args[:data].is_a? String
 
         result = case options[:deserialize]
-        when :json
-          require 'json'
-          JSON.parse args[:data]
-        when :yaml
-          require 'yaml'
-          YAML::load args[:data]
-        else
-          Hiera.warn("Invalid configuration for :deserialize; found #{options[:deserialize]}")
-          args[:data]
-        end
+                 when :json
+                   require 'json'
+                   JSON.parse args[:data]
+                 when :yaml
+                   require 'yaml'
+                   YAML.load args[:data]
+                 else
+                   Hiera.warn("Invalid configuration for :deserialize; found #{options[:deserialize]}")
+                   args[:data]
+                 end
 
         Hiera.debug("Deserialized #{options[:deserialize].to_s.upcase}")
         result
@@ -53,7 +53,7 @@ class Hiera
 
           case resolution_type
           when :array
-            raise Exception, "Hiera type mismatch: expected Array and got #{new_answer.class}" unless new_answer.is_a? Array or new_answer.is_a? String
+            raise Exception, "Hiera type mismatch: expected Array and got #{new_answer.class}" unless new_answer.is_a?(Array) || new_answer.is_a?(String)
             answer ||= []
             answer << new_answer
           when :hash
