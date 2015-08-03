@@ -45,9 +45,7 @@ class Hiera
 
           data = redis_query redis_key
 
-          data = deserialize(:data => data,
-                  :redis_key => redis_key,
-                  :key => key) if options.include? :deserialize
+          data = deserialize(data: data, redis_key: redis_key, key: key) if options.include?(:deserialize)
 
           next unless data
 
@@ -76,14 +74,14 @@ class Hiera
       def connect
         # override default options
         @options = {
-          :host => 'localhost',
-          :port => 6379,
-          :db => 0,
-          :password => nil,
-          :timeout => 3,
-          :path => nil,
-          :soft_connection_failure => false,
-          :separator => ':'
+          host: 'localhost',
+          port: 6379,
+          db: 0,
+          password: nil,
+          timeout: 3,
+          path: nil,
+          soft_connection_failure: false,
+          separator: ':'
         }.merge Config[:redis] || {}
 
         require 'redis'
