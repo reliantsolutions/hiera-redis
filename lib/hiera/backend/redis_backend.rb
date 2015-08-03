@@ -55,11 +55,11 @@ class Hiera
 
           case resolution_type
           when :array
-            raise Exception, "Hiera type mismatch: expected Array and got #{new_answer.class}" unless new_answer.is_a?(Array) || new_answer.is_a?(String)
+            raise "Hiera type mismatch: expected Array and got #{new_answer.class}" unless new_answer.is_a?(Array) || new_answer.is_a?(String)
             answer ||= []
             answer << new_answer
           when :hash
-            raise Exception, "Hiera type mismatch: expected Hash and got #{new_answer.class}" unless new_answer.is_a? Hash
+            raise "Hiera type mismatch: expected Hash and got #{new_answer.class}" unless new_answer.is_a? Hash
             answer ||= {}
             answer = new_answer.merge answer
           else
