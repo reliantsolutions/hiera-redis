@@ -1,13 +1,15 @@
+require 'redis'
+
 class Hiera
   module Backend
     class Redis_backend
       VERSION = '1.0.2'
 
-      attr_reader :redis, :options
+      attr_reader :options
 
       def initialize
         Hiera.debug("Hiera Redis backend #{VERSION} starting")
-        @redis = connect
+        @options = { separator: ':', soft_connection_failure: false }.merge(Config[:redis] || {})
       end
 
       def deserialize(args = {})
@@ -71,24 +73,8 @@ class Hiera
 
       private
 
-      def connect
-        # override default options
-        @options = {
-          host: 'localhost',
-          port: 6379,
-          db: 0,
-          password: nil,
-          timeout: 3,
-          path: nil,
-          soft_connection_failure: false,
-          separator: ':'
-        }.merge Config[:redis] || {}
-
-        require 'redis'
-
-        Redis.new(options)
-      rescue LoadError
-        retry if require 'rubygems'
+      def redis
+        @redis ||= Redis.new(@options)
       end
 
       def redis_query(redis_key)
