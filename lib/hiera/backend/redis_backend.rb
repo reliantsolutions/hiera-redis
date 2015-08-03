@@ -1,5 +1,3 @@
-require 'redis'
-
 class Hiera
   module Backend
     class Redis_backend
@@ -8,6 +6,7 @@ class Hiera
       attr_reader :options
 
       def initialize
+        require 'redis'
         Hiera.debug("Hiera Redis backend #{VERSION} starting")
         @options = { separator: ':', soft_connection_failure: false }.merge(Config[:redis] || {})
       end
