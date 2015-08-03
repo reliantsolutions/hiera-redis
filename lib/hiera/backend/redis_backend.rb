@@ -53,11 +53,11 @@ class Hiera
 
           case resolution_type.is_a?(Hash) ? :hash : resolution_type
           when :array
-            raise "Hiera type mismatch: expected Array and got #{new_answer.class}" unless new_answer.is_a?(Array) || new_answer.is_a?(String)
+            check_type(key, new_answer, Array, String)
             answer ||= []
             answer << new_answer
           when :hash
-            raise "Hiera type mismatch: expected Hash and got #{new_answer.class}" unless new_answer.is_a? Hash
+            check_type(key, new_answer, Hash)
             answer ||= {}
             answer = Backend.merge_answer(new_answer, answer, resolution_type)
           else
@@ -71,6 +71,12 @@ class Hiera
       end
 
       private
+
+      def check_type(key, value, *types)
+        return if types.any? { |type| value.is_a?(type) }
+        expected = types.map(&:name).join(' or ')
+        raise "Hiera type mismatch for key '#{key}': expected #{expected} and got #{value.class}"
+      end
 
       def redis
         @redis ||= Redis.new(@options)
