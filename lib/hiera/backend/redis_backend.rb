@@ -2,12 +2,12 @@ class Hiera
   module Backend
     class Redis_backend
 
-      VERSION="1.0.2"
+      VERSION='1.0.2'
 
       attr_reader :redis, :options
 
       def initialize
-        Hiera.debug("Hiera Redis backend %s starting" % VERSION)
+        Hiera.debug('Hiera Redis backend %s starting' % VERSION)
         @redis = connect
       end
 
@@ -23,26 +23,26 @@ class Hiera
           require 'yaml'
           YAML::load args[:data]
         else
-          Hiera.warn "Invalid configuration for :deserialize; found %s" % options[:deserialize]
+          Hiera.warn 'Invalid configuration for :deserialize; found %s' % options[:deserialize]
           args[:data]
         end
 
-        Hiera.debug "Deserialized %s" % options[:deserialize].to_s.upcase
+        Hiera.debug 'Deserialized %s' % options[:deserialize].to_s.upcase
         result
 
       # when we try to deserialize a string
       rescue JSON::ParserError
         args[:data]
       rescue => e
-        Hiera.warn "Exception raised: %s: %s" % [e.class, e.message]
+        Hiera.warn 'Exception raised: %s: %s' % [e.class, e.message]
       end
 
       def lookup(key, scope, order_override, resolution_type, context = {})
         answer = nil
 
         Backend.datasources(scope, order_override) do |source|
-          redis_key = "%s" % [source.split('/'), key].join(options[:separator])
-          Hiera.debug "Looking for %s%s%s" % [source, options[:separator], key]
+          redis_key = '%s' % [source.split('/'), key].join(options[:separator])
+          Hiera.debug 'Looking for %s%s%s' % [source, options[:separator], key]
 
           data = redis_query redis_key
 
@@ -109,7 +109,7 @@ class Hiera
         when 'zset'
           redis.zrange(redis_key, 0, -1)
         else
-          Hiera.debug("No such key: %s" % redis_key)
+          Hiera.debug('No such key: %s' % redis_key)
           nil
         end
       rescue Redis::CannotConnectError => e
