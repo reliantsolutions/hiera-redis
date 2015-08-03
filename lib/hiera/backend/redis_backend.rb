@@ -90,7 +90,7 @@ class Hiera
           Hiera.debug("No such key: #{redis_key}")
           nil
         end
-      rescue Redis::CannotConnectError => e
+      rescue Redis::CannotConnectError, Errno::ENOENT => e
         Hiera.warn('Cannot connect to Redis server')
         raise e unless options[:soft_connection_failure]
         nil
