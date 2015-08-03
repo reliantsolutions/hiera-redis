@@ -37,7 +37,7 @@ class Hiera
         Hiera.warn("Exception raised: #{e.class}: #{e.message}")
       end
 
-      def lookup(key, scope, order_override, resolution_type, context = {})
+      def lookup(key, scope, order_override, resolution_type, context)
         answer = nil
 
         Backend.datasources(scope, order_override) do |source|
@@ -45,9 +45,9 @@ class Hiera
           data = redis_query(redis_key)
           data = deserialize(data: data, redis_key: redis_key, key: key) if options.include?(:deserialize)
 
-          next unless data
+          next if data.nil?
 
-          new_answer = Backend.parse_answer(data, scope, context = context)
+          new_answer = Backend.parse_answer(data, scope, {}, context)
 
           case resolution_type
           when :array
