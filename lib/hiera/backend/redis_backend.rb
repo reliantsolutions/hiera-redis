@@ -68,6 +68,10 @@ class Hiera
 
         throw :no_such_key unless found
         answer
+      rescue Redis::CannotConnectError, Errno::ENOENT => e
+        Hiera.warn('Cannot connect to Redis server')
+        raise e unless options[:soft_connection_failure]
+        nil
       end
 
       private
@@ -94,14 +98,7 @@ class Hiera
           redis.get(redis_key)
         when 'zset'
           redis.zrange(redis_key, 0, -1)
-        else
-          Hiera.debug("No such key: #{redis_key}")
-          nil
         end
-      rescue Redis::CannotConnectError, Errno::ENOENT => e
-        Hiera.warn('Cannot connect to Redis server')
-        raise e unless options[:soft_connection_failure]
-        nil
       end
     end
   end
