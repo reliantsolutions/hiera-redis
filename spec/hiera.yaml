@@ -1,0 +1,4 @@
+:backends:
+  - redis
+:redis:
+  :port: 234

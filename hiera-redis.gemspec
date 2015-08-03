@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.license = 'GPL-3'
   s.add_dependency 'hiera', '>= 1.0'
   s.add_dependency 'redis', '>= 3.2'
+  s.add_development_dependency 'rspec', '~> 3.3'
   s.files = Dir['lib/**/*.rb']
   s.files += ['COPYING']
 end
