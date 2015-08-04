@@ -9,32 +9,25 @@ class Hiera
         require 'redis'
         Hiera.debug("Hiera Redis backend #{VERSION} starting")
         @options = { separator: ':', soft_connection_failure: false }.merge(Config[:redis] || {})
+        case options[:deserialize]
+        when :json then require 'json'
+        when :yaml then require 'yaml'
+        end
       end
 
-      def deserialize(args = {})
-        return nil if args[:data].nil?
-        return args[:data] unless args[:data].is_a? String
+      def deserialize(value)
+        return value unless value.is_a?(String)
 
-        result = case options[:deserialize]
-                 when :json
-                   require 'json'
-                   JSON.parse args[:data]
-                 when :yaml
-                   require 'yaml'
-                   YAML.load args[:data]
-                 else
-                   Hiera.warn("Invalid configuration for :deserialize; found #{options[:deserialize]}")
-                   args[:data]
-                 end
-
-        Hiera.debug("Deserialized #{options[:deserialize].to_s.upcase}")
-        result
-
-      # when we try to deserialize a string
-      rescue JSON::ParserError
-        args[:data]
+        case options[:deserialize]
+        when :json then JSON.parse(value)
+        when :yaml then YAML.load(value)
+        else
+          Hiera.warn("Invalid configuration for :deserialize; found #{options[:deserialize]}")
+          value
+        end
       rescue => e
-        Hiera.warn("Exception raised: #{e.class}: #{e.message}")
+        Hiera.warn("Error de-serializing data: #{e.class}: #{e.message}")
+        value
       end
 
       def lookup(key, scope, order_override, resolution_type, context)
@@ -44,7 +37,7 @@ class Hiera
         Backend.datasources(scope, order_override) do |source|
           redis_key = (source.split('/') << key).join(options[:separator])
           data = redis_query(redis_key)
-          data = deserialize(data: data, redis_key: redis_key, key: key) if options.include?(:deserialize)
+          data = deserialize(data) if options[:deserialize]
 
           next if data.nil?
           found = true

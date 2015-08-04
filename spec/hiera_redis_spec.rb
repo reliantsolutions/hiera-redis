@@ -1,5 +1,6 @@
 require 'hiera'
 require 'redis'
+require 'json'
 
 describe 'hiera-redis' do
   let(:hiera) do
@@ -16,6 +17,7 @@ describe 'hiera-redis' do
   let(:redis) { Redis.new }
 
   before(:each) do
+    Hiera::Backend.clear!
     redis.flushdb
   end
 
@@ -50,5 +52,25 @@ describe 'hiera-redis' do
     expect(hiera.lookup('foo', '', '')).to eq('main')
     # now as an array, order is important.
     expect(hiera.lookup('foo', '', '', '', :array)).to eq(%w(main common))
+  end
+
+  context 'when serializing data' do
+    let(:hiera) do
+      Hiera.new(config: {
+                  default: nil,
+                  backends: ['redis'],
+                  hierarchy: %w(main common),
+                  redis: { deserialize: :json },
+                  scope: {},
+                  key: nil,
+                  verbose: false,
+                  resolution_type: :priority,
+                  format: :ruby })
+    end
+
+    it 'works with json data' do
+      redis.set('main:foo', [1, 2, 3].to_json)
+      expect(hiera.lookup('foo', '', '')).to eq([1, 2, 3])
+    end
   end
 end
