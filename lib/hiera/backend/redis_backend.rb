@@ -36,12 +36,10 @@ class Hiera
 
         Backend.datasources(scope, order_override) do |source|
           redis_key = (source.split('/') << key).join(options[:separator])
-          data = redis_query(redis_key)
-          data = deserialize(data) if options[:deserialize]
-
+          data = read_value(redis_key)
           next if data.nil?
-          found = true
 
+          found = true
           new_answer = Backend.parse_answer(data, scope, {}, context)
 
           case resolution_type.is_a?(Hash) ? :hash : resolution_type
@@ -76,6 +74,11 @@ class Hiera
 
       def redis
         @redis ||= Redis.new(@options)
+      end
+
+      def read_value(key)
+        data = redis_query(key)
+        options[:deserialize] ? deserialize(data) : data
       end
 
       def redis_query(redis_key)
