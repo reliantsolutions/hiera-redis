@@ -69,9 +69,8 @@ class Hiera
         throw :no_such_key unless found
         answer
       rescue Redis::CannotConnectError, Errno::ENOENT => e
-        Hiera.warn('Cannot connect to Redis server')
+        Hiera.warn("Cannot connect to redis server at #{redis.id}")
         raise e unless options[:soft_connection_failure]
-        nil
       end
 
       private
