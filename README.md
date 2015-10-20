@@ -83,7 +83,10 @@ strings stored in Redis (JSON and YAML supported).
 Contact
 =======
 
-* Author: Adam Kosmin c/o Reliant Security, Inc.
+* Maintainer: Hugo Parente Lima c/o Reliant Security, Inc.
+* Email: hugoATreliantsecurity.com
+* IRC (freenode): hugopl
+* Original Author: Adam Kosmin c/o Reliant Security, Inc.
 * Email: akosminATreliantsecurity.com
 * IRC (freenode): windowsrefund
 
